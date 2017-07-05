@@ -108,6 +108,7 @@ def Get_rawdata_fast(connection, channelid, mintime, maxtime):
 	finalframe.drop('data_type', axis=1, inplace=True)
 	finalframe.columns = [datatype[1]]
 	finalframe = finalframe[~finalframe.index.duplicated(keep='first')]
+	# Associates datatype numbers with desciptions for column names
 	types = [(21, 'Voltage'), (23, 'Charge_Capacity'), (24, 'Discharge_Capacity')
 			, (25, 'Charge_Energy'), (26, 'Discharge_Energy'), (27, 'dV/dt'), (30, 'Internal_Resistance')]
 	for datatype in types:
