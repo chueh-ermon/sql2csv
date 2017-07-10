@@ -13,109 +13,107 @@ import numpy as np
 import pickle
 from sql_func_ch import *
 from frame_func_ch import *
-while 1 == 1:
-	host = 'SQLHOST' # connection information for the local SQL server
-	user = 'sa'
-	password = 'arbin'
-	database = 'master'
-	abandoned_time = 1209600
-	datafolder = os.path.normpath('C:/Data/')
-	convert_file = 'converted_test_channels.pickle'
-	channel_delimiter = '_CH'
-	Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F','AB-CC_CV_5V10A_Cap-5V200F',
-					  'AB-AUXT_V', 'AB-CC_CV_5V2_5A_Cap-5V50F', 'AB-FUNSC_5V10A_Cap-5V200F',
-					  '11', '22', '222', 'AB-CC_CV_5V2_5A_Cap-5V50F-04',
-	                                  'AB-FUNSC_5V5A_Cap-5V200F', 'AB-FUNSC_5V5A_Cap-5V1300F', 'AB-CC_CV_5V2_5A_Cap-5V50F-02', 'Test',
-	                                  'TEST', 'TEST_CAL', 'TEST_chan05', 'TEST_chan05_02', 'TEST2',
-	                                  '111', 'AB-CC_CV_5V2_5A_Cap-5V50F-03', '00', 'Test2',
-	                                  'Arbin_newA_chan8_test_02', 'Arbin_newA_chan8_test_03',
-	                                  '20170509_4_8C-3_6V_test',
-	                                  '20170509_6_0C-3_6V_test','20170509_4C_1C_3_6V',
-	                                  '20170510_testpolicies', '20170411-NP-a123fc-rev2',
-	                                  '20170411-np-6C3C','20170411-np-NP_overpotential','2017-05-18_restingforaesthetics',
-	                                  'GITT_aged_cells','2017-06-30','2017-06-29-final_policy_test','20170628_Rest','2017-06-27_current_logging_test',
-	                                  '2017-06-27_6C_test', '2017-06-27_6C_Rest_Test', '2017-06-26_6C_Rest_Test', '2017-06-22_6C_50per_3C_1sTimeStep',
-	                                  '2017-05-12_8C-35per_3_6C','2017-05-12_8C-25per_3_6C','2017-05-12_8C-15per_3_6C',
-	                                  '2017-05-12_7C-40per_3C', '2017-05-12_7C-40per_3_6C', '2017-05-12_7C-30per_3_6C',
-	                                  '2017-05-12_6C-60per_3C','2017-05-12_6C-50per_3_6C','2017-05-12_6C-50per_3C',
-	                                  '2017-05-12_6C-40per_3_6C','2017-05-12_6C-40per_3C','2017-05-12_6C-30per_3_6C',
-	                                  '2017-05-12_5_4C-80per_5_4C','2017-05-12_5_4C-70per_3C', '2017-05-12_5_4C-60per_3_6C',
-	                                  '2017-05-12_5_4C-60per_3C', '2017-05-12_5_4C-50per_3_6C','2017-05-12_5_4C-50per_3C',
-	                                  '2017-05-12_5_4C-40per_3_6C', '2017-05-12_4C-80per_4C','2017-05-12_4_8C-80per_4_8C',
-	                                  '2017-05-12_4_4C-80per_4_4C','2017-05-12_3_6C-80per_3_6C']
 
-	conn = pypyodbc.connect('Driver={SQL Server};'
-							'Server=localhost\SQLEXPRESS;'
-							'Database=ArbinMasterData;'
-							'uid=sa;pwd=arbin')
+datafolder = os.path.normpath('C:/Data/')
+convert_file = 'converted_test_channels.pickle'
+channel_delimiter = '_CH'
+Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
+                  'AB-AUXT_V', 'AB-CC_CV_5V2_5A_Cap-5V50F', 'AB-FUNSC_5V10A_Cap-5V200F',
+                  '11', '22', '222', 'AB-CC_CV_5V2_5A_Cap-5V50F-04',
+                  'AB-FUNSC_5V5A_Cap-5V200F', 'AB-FUNSC_5V5A_Cap-5V1300F', 'AB-CC_CV_5V2_5A_Cap-5V50F-02', 'Test',
+                  'TEST', 'TEST_CAL', 'TEST_chan05', 'TEST_chan05_02', 'TEST2',
+                  '111', 'AB-CC_CV_5V2_5A_Cap-5V50F-03', '00', 'Test2',
+                  'Arbin_newA_chan8_test_02', 'Arbin_newA_chan8_test_03',
+                  '20170509_4_8C-3_6V_test',
+                  '20170509_6_0C-3_6V_test', '20170509_4C_1C_3_6V',
+                  '20170510_testpolicies', '20170411-NP-a123fc-rev2',
+                  '20170411-np-6C3C', '20170411-np-NP_overpotential', '2017-05-18_restingforaesthetics',
+                  'GITT_aged_cells', '2017-06-30', '2017-06-29-final_policy_test', '20170628_Rest',
+                  '2017-06-27_current_logging_test',
+                  '2017-06-27_6C_test', '2017-06-27_6C_Rest_Test', '2017-06-26_6C_Rest_Test',
+                  '2017-06-22_6C_50per_3C_1sTimeStep',
+                  '2017-05-12_8C-35per_3_6C', '2017-05-12_8C-25per_3_6C', '2017-05-12_8C-15per_3_6C',
+                  '2017-05-12_7C-40per_3C', '2017-05-12_7C-40per_3_6C', '2017-05-12_7C-30per_3_6C',
+                  '2017-05-12_6C-60per_3C', '2017-05-12_6C-50per_3_6C', '2017-05-12_6C-50per_3C',
+                  '2017-05-12_6C-40per_3_6C', '2017-05-12_6C-40per_3C', '2017-05-12_6C-30per_3_6C',
+                  '2017-05-12_5_4C-80per_5_4C', '2017-05-12_5_4C-70per_3C', '2017-05-12_5_4C-60per_3_6C',
+                  '2017-05-12_5_4C-60per_3C', '2017-05-12_5_4C-50per_3_6C', '2017-05-12_5_4C-50per_3C',
+                  '2017-05-12_5_4C-40per_3_6C', '2017-05-12_4C-80per_4C', '2017-05-12_4_8C-80per_4_8C',
+                  '2017-05-12_4_4C-80per_4_4C', '2017-05-12_3_6C-80per_3_6C']
 
-	t0 = time.time()
-	c = conn.cursor()
-	############# Uncomment for Production ###############
-	testnames = Get_test_names(c)
-	testnames = list(set(testnames)-set(Excluded_tests))
-	############ Comment out for Production #############
-	# testnames = ['2017-05-12_6C-50per_3_6C']
-	######################################################
+while True:
+    conn = pypyodbc.connect('Driver={SQL Server};'
+                            'Server=localhost\SQLEXPRESS;'
+                            'Database=ArbinMasterData;'
+                            'uid=sa;pwd=arbin')
 
-	testname_chs =[]
-	for test in testnames:
-		test_ids = Get_Test_IDs(c, test)
-		testid = test_ids[-1] # just take the most recent test with this name
-		chans = Get_Channel_ID(c, testid)
-		for chan in chans:
-			testname_chs.append([test, testid, chan])
+    t0 = time.time()
+    c = conn.cursor()
+    ############# Uncomment for Production ###############
+    testnames = Get_test_names(c)
+    testnames = list(set(testnames) - set(Excluded_tests))
+    ############ Comment out for Production #############
+    # testnames = ['2017-05-12_6C-50per_3_6C']
+    ######################################################
 
-	############### Comment out for Production ###########
-	#print(testname_chs[0:6])
-	#testname_chs = testname_chs[0:6]
-	######################################################
+    testname_chs = []
+    for test in testnames:
+        test_ids = Get_Test_IDs(c, test)
+        testid = test_ids[-1]  # just take the most recent test with this name
+        chans = Get_Channel_ID(c, testid)
+        for chan in chans:
+            testname_chs.append([test, testid, chan])
 
-	try: 
-		converted_tests = pandas.read_pickle(convert_file)
-	except:
-		converted_tests = pandas.DataFrame(columns=['converted_test_ch', 'lasttime','record_length'])
+        ############### Comment out for Production ###########
+        # print(testname_chs[0:6])
+        # testname_chs = testname_chs[0:6]
+    ######################################################
 
-	for testname_ch in testname_chs:
-		name = testname_ch[0] + channel_delimiter + str(testname_ch[2] + 1) # +1 for liveware indexing
-		if name in converted_tests.converted_test_ch.unique():
-			test_fin_times = converted_tests.lasttime[converted_tests['converted_test_ch'] == name]
-			test_lengths = converted_tests.record_length[converted_tests['converted_test_ch'] == name]
-			test_fin_time = test_fin_times.max()
-			test_length = test_lengths.max()
-			print('Updating: ', name)
-		else:
-			test_fin_time = -1
-			newrow = pandas.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
-			converted_tests = converted_tests.append(newrow, ignore_index=True)
-			test_length = 0
-			print('New test:', name)
+    try:
+        converted_tests = pandas.read_pickle(convert_file)
+    except:
+        converted_tests = pandas.DataFrame(columns=['converted_test_ch', 'lasttime', 'record_length'])
 
-	# 	Test_ids = Get_Test_IDs(c, testname)
-		MetadataFrame = Get_Metadata(conn, testname_ch[1], testname_ch[2])
-		TestFrame, lasttime, t2 = FullFrame(testname_ch[1], testname_ch[2], test_fin_time, conn, c)
+    for testname_ch in testname_chs:
+        name = testname_ch[0] + channel_delimiter + str(testname_ch[2] + 1)  # +1 for liveware indexing
+        if name in converted_tests.converted_test_ch.unique():
+            test_fin_times = converted_tests.lasttime[converted_tests['converted_test_ch'] == name]
+            test_lengths = converted_tests.record_length[converted_tests['converted_test_ch'] == name]
+            test_fin_time = test_fin_times.max()
+            test_length = test_lengths.max()
+            print('Updating: ', name)
+        else:
+            test_fin_time = -1
+            newrow = pandas.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
+            converted_tests = converted_tests.append(newrow, ignore_index=True)
+            test_length = 0
+            print('New test:', name)
 
-		framelength = TestFrame['Cycle_Index'].count()
-		
-		if (lasttime <= test_fin_time)&(lasttime > 0):
-			print('Already converted:', name)
-		else:
-			# Test_summary = Frame_summary(TestFrame)
-			# Test_summary.to_csv(os.path.join(datafolder,'CycSum_' + testname + '.csv'), sep=',')
+        # 	Test_ids = Get_Test_IDs(c, testname)
+        MetadataFrame = Get_Metadata(conn, testname_ch[1], testname_ch[2])
+        TestFrame, lasttime, t2 = FullFrame(testname_ch[1], testname_ch[2], test_fin_time, conn, c)
 
-			TestFrame.to_csv(os.path.join(datafolder, name + '.csv'), sep=',')
-			MetadataFrame.to_csv(os.path.join(datafolder, name + '_Metadata' + '.csv'), sep=',')
+        framelength = TestFrame['Cycle_Index'].count()
 
-			if framelength == test_length: 
-				lasttime = time.time()
+        if (lasttime <= test_fin_time) & (lasttime > 0):
+            print('Already converted:', name)
+        else:
+            # Test_summary = Frame_summary(TestFrame)
+            # Test_summary.to_csv(os.path.join(datafolder,'CycSum_' + testname + '.csv'), sep=',')
 
-		converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = lasttime
-		converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = framelength
-	print(converted_tests)
-	converted_tests.to_pickle(convert_file)
-	conn.close()
+            TestFrame.to_csv(os.path.join(datafolder, name + '.csv'), sep=',')
+            MetadataFrame.to_csv(os.path.join(datafolder, name + '_Metadata' + '.csv'), sep=',')
 
-	t1 = time.time()
-	print("Total run time:", t1-t0)
-	print("Query time:", t2-t0)
-	time.sleep(1500)
+            if framelength == test_length:
+                lasttime = time.time()
+
+        converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = lasttime
+        converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = framelength
+    print(converted_tests)
+    converted_tests.to_pickle(convert_file)
+    conn.close()
+
+    t1 = time.time()
+    print("Total run time:", t1 - t0)
+    print("Query time:", t2 - t0)
+    time.sleep(1500)
