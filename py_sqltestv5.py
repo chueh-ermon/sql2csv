@@ -12,35 +12,7 @@ from sql_func_ch import *
 from frame_func_ch import *
 
 
-data_folder = os.path.normpath('C:/Data/')
-path_converted_test_channels = 'converted_test_channels.pickle'
-channel_delimiter = '_CH'
-Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
-                  'AB-AUXT_V', 'AB-CC_CV_5V2_5A_Cap-5V50F', 'AB-FUNSC_5V10A_Cap-5V200F',
-                  '11', '22', '222', 'AB-CC_CV_5V2_5A_Cap-5V50F-04',
-                  'AB-FUNSC_5V5A_Cap-5V200F', 'AB-FUNSC_5V5A_Cap-5V1300F', 'AB-CC_CV_5V2_5A_Cap-5V50F-02', 'Test',
-                  'TEST', 'TEST_CAL', 'TEST_chan05', 'TEST_chan05_02', 'TEST2',
-                  '111', 'AB-CC_CV_5V2_5A_Cap-5V50F-03', '00', 'Test2',
-                  'Arbin_newA_chan8_test_02', 'Arbin_newA_chan8_test_03',
-                  '20170509_4_8C-3_6V_test',
-                  '20170509_6_0C-3_6V_test', '20170509_4C_1C_3_6V',
-                  '20170510_testpolicies', '20170411-NP-a123fc-rev2',
-                  '20170411-np-6C3C', '20170411-np-NP_overpotential', '2017-05-18_restingforaesthetics',
-                  'GITT_aged_cells', '2017-06-30', '2017-06-29-final_policy_test', '20170628_Rest',
-                  '2017-06-27_current_logging_test',
-                  '2017-06-27_6C_test', '2017-06-27_6C_Rest_Test', '2017-06-26_6C_Rest_Test',
-                  '2017-06-22_6C_50per_3C_1sTimeStep',
-                  '2017-05-12_8C-35per_3_6C', '2017-05-12_8C-25per_3_6C', '2017-05-12_8C-15per_3_6C',
-                  '2017-05-12_7C-40per_3C', '2017-05-12_7C-40per_3_6C', '2017-05-12_7C-30per_3_6C',
-                  '2017-05-12_6C-60per_3C', '2017-05-12_6C-50per_3_6C', '2017-05-12_6C-50per_3C',
-                  '2017-05-12_6C-40per_3_6C', '2017-05-12_6C-40per_3C', '2017-05-12_6C-30per_3_6C',
-                  '2017-05-12_5_4C-80per_5_4C', '2017-05-12_5_4C-70per_3C', '2017-05-12_5_4C-60per_3_6C',
-                  '2017-05-12_5_4C-60per_3C', '2017-05-12_5_4C-50per_3_6C', '2017-05-12_5_4C-50per_3C',
-                  '2017-05-12_5_4C-40per_3_6C', '2017-05-12_4C-80per_4C', '2017-05-12_4_8C-80per_4_8C',
-                  '2017-05-12_4_4C-80per_4_4C', '2017-05-12_3_6C-80per_3_6C']
-
-
-def parser():
+def parser(data_folder, path_converted_test_channels, channel_delimiter, excluded_tests):
     conn = pypyodbc.connect('Driver={SQL Server};'
                             'Server=localhost\SQLEXPRESS;'
                             'Database=ArbinMasterData;'
@@ -50,7 +22,7 @@ def parser():
     c = conn.cursor()
 
     test_names = Get_test_names(c)
-    test_names = list(set(test_names) - set(Excluded_tests))
+    test_names = list(set(test_names) - set(excluded_tests))
 
     test_name_chs = []
     for test in test_names:
@@ -104,8 +76,35 @@ def parser():
 
 
 def main():
+    data_folder = os.path.normpath('C:/Data/')
+    path_converted_test_channels = 'converted_test_channels.pickle'
+    channel_delimiter = '_CH'
+    excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
+                      'AB-AUXT_V', 'AB-CC_CV_5V2_5A_Cap-5V50F', 'AB-FUNSC_5V10A_Cap-5V200F',
+                      '11', '22', '222', 'AB-CC_CV_5V2_5A_Cap-5V50F-04',
+                      'AB-FUNSC_5V5A_Cap-5V200F', 'AB-FUNSC_5V5A_Cap-5V1300F', 'AB-CC_CV_5V2_5A_Cap-5V50F-02', 'Test',
+                      'TEST', 'TEST_CAL', 'TEST_chan05', 'TEST_chan05_02', 'TEST2',
+                      '111', 'AB-CC_CV_5V2_5A_Cap-5V50F-03', '00', 'Test2',
+                      'Arbin_newA_chan8_test_02', 'Arbin_newA_chan8_test_03',
+                      '20170509_4_8C-3_6V_test',
+                      '20170509_6_0C-3_6V_test', '20170509_4C_1C_3_6V',
+                      '20170510_testpolicies', '20170411-NP-a123fc-rev2',
+                      '20170411-np-6C3C', '20170411-np-NP_overpotential', '2017-05-18_restingforaesthetics',
+                      'GITT_aged_cells', '2017-06-30', '2017-06-29-final_policy_test', '20170628_Rest',
+                      '2017-06-27_current_logging_test',
+                      '2017-06-27_6C_test', '2017-06-27_6C_Rest_Test', '2017-06-26_6C_Rest_Test',
+                      '2017-06-22_6C_50per_3C_1sTimeStep',
+                      '2017-05-12_8C-35per_3_6C', '2017-05-12_8C-25per_3_6C', '2017-05-12_8C-15per_3_6C',
+                      '2017-05-12_7C-40per_3C', '2017-05-12_7C-40per_3_6C', '2017-05-12_7C-30per_3_6C',
+                      '2017-05-12_6C-60per_3C', '2017-05-12_6C-50per_3_6C', '2017-05-12_6C-50per_3C',
+                      '2017-05-12_6C-40per_3_6C', '2017-05-12_6C-40per_3C', '2017-05-12_6C-30per_3_6C',
+                      '2017-05-12_5_4C-80per_5_4C', '2017-05-12_5_4C-70per_3C', '2017-05-12_5_4C-60per_3_6C',
+                      '2017-05-12_5_4C-60per_3C', '2017-05-12_5_4C-50per_3_6C', '2017-05-12_5_4C-50per_3C',
+                      '2017-05-12_5_4C-40per_3_6C', '2017-05-12_4C-80per_4C', '2017-05-12_4_8C-80per_4_8C',
+                      '2017-05-12_4_4C-80per_4_4C', '2017-05-12_3_6C-80per_3_6C']
+
     while True:
-        parser()
+        parser(data_folder, path_converted_test_channels, channel_delimiter, excluded_tests)
         sleep(1500)
 
 if __name__ == "__main__":
