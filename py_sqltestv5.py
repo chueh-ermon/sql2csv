@@ -82,16 +82,16 @@ def parser():
             test_length = 0
             print('New test:', name)
 
-        MetadataFrame = Get_Metadata(conn, test_name_ch[1], test_name_ch[2])
-        TestFrame, last_time, t2 = FullFrame(test_name_ch[1], test_name_ch[2], test_fin_time, conn, c)
+        metadata_frame = Get_Metadata(conn, test_name_ch[1], test_name_ch[2])
+        test_frame, last_time, t2 = FullFrame(test_name_ch[1], test_name_ch[2], test_fin_time, conn, c)
 
-        frame_length = TestFrame['Cycle_Index'].count()
+        frame_length = test_frame['Cycle_Index'].count()
 
         if (last_time <= test_fin_time) & (last_time > 0):
             print('Already converted:', name)
         else:
-            TestFrame.to_csv(os.path.join(data_folder, name + '.csv'), sep=',')
-            MetadataFrame.to_csv(os.path.join(data_folder, name + '_Metadata' + '.csv'), sep=',')
+            test_frame.to_csv(os.path.join(data_folder, name + '.csv'), sep=',')
+            metadata_frame.to_csv(os.path.join(data_folder, name + '_Metadata' + '.csv'), sep=',')
             if frame_length == test_length:
                 last_time = time.time()
         converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = last_time
