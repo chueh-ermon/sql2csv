@@ -6,9 +6,7 @@
 # 
 import os
 import pypyodbc
-import pandas
-import csv
-import time
+from time import time, sleep
 import numpy as np
 import pickle
 from sql_func_ch import *
@@ -48,7 +46,7 @@ def parser():
                             'Database=ArbinMasterData;'
                             'uid=sa;pwd=arbin')
 
-    t0 = time.time()
+    t0 = time()
     c = conn.cursor()
 
     test_names = Get_test_names(c)
@@ -63,9 +61,9 @@ def parser():
             test_name_chs.append([test, test_id, chan])
 
     try:
-        converted_tests = pandas.read_pickle(path_converted_test_channels)
+        converted_tests = pd.read_pickle(path_converted_test_channels)
     except:
-        converted_tests = pandas.DataFrame(columns=['converted_test_ch', 'lasttime', 'record_length'])
+        converted_tests = pd.DataFrame(columns=['converted_test_ch', 'lasttime', 'record_length'])
 
     for test_name_ch in test_name_chs:
         name = test_name_ch[0] + channel_delimiter + str(test_name_ch[2] + 1)  # +1 for liveware indexing
@@ -77,7 +75,7 @@ def parser():
             print('Updating: ', name)
         else:
             test_fin_time = -1
-            new_row = pandas.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
+            new_row = pd.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
             converted_tests = converted_tests.append(new_row, ignore_index=True)
             test_length = 0
             print('New test:', name)
@@ -93,14 +91,14 @@ def parser():
             test_frame.to_csv(os.path.join(data_folder, name + '.csv'), sep=',')
             metadata_frame.to_csv(os.path.join(data_folder, name + '_Metadata' + '.csv'), sep=',')
             if frame_length == test_length:
-                last_time = time.time()
+                last_time = time()
         converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = last_time
         converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = frame_length
     print(converted_tests)
     converted_tests.to_pickle(path_converted_test_channels)
     conn.close()
 
-    t1 = time.time()
+    t1 = time()
     print("Total run time:", t1 - t0)
     print("Query time:", t2 - t0)
 
@@ -108,7 +106,7 @@ def parser():
 def main():
     while True:
         parser()
-        time.sleep(1500)
+        sleep(1500)
 
 if __name__ == "__main__":
     main()
