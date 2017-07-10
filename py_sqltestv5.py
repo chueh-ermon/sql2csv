@@ -15,7 +15,7 @@ from sql_func_ch import *
 from frame_func_ch import *
 
 data_folder = os.path.normpath('C:/Data/')
-convert_file = 'converted_test_channels.pickle'
+path_converted_test_channels = 'converted_test_channels.pickle'
 channel_delimiter = '_CH'
 Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
                   'AB-AUXT_V', 'AB-CC_CV_5V2_5A_Cap-5V50F', 'AB-FUNSC_5V10A_Cap-5V200F',
@@ -41,7 +41,8 @@ Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
                   '2017-05-12_5_4C-40per_3_6C', '2017-05-12_4C-80per_4C', '2017-05-12_4_8C-80per_4_8C',
                   '2017-05-12_4_4C-80per_4_4C', '2017-05-12_3_6C-80per_3_6C']
 
-while True:
+
+def parser():
     conn = pypyodbc.connect('Driver={SQL Server};'
                             'Server=localhost\SQLEXPRESS;'
                             'Database=ArbinMasterData;'
@@ -62,7 +63,7 @@ while True:
             test_name_chs.append([test, test_id, chan])
 
     try:
-        converted_tests = pandas.read_pickle(convert_file)
+        converted_tests = pandas.read_pickle(path_converted_test_channels)
     except:
         converted_tests = pandas.DataFrame(columns=['converted_test_ch', 'lasttime', 'record_length'])
 
@@ -81,26 +82,33 @@ while True:
             test_length = 0
             print('New test:', name)
 
-        # 	Test_ids = Get_Test_IDs(c, testname)
         MetadataFrame = Get_Metadata(conn, test_name_ch[1], test_name_ch[2])
         TestFrame, last_time, t2 = FullFrame(test_name_ch[1], test_name_ch[2], test_fin_time, conn, c)
 
-        framelength = TestFrame['Cycle_Index'].count()
+        frame_length = TestFrame['Cycle_Index'].count()
 
         if (last_time <= test_fin_time) & (last_time > 0):
             print('Already converted:', name)
         else:
             TestFrame.to_csv(os.path.join(data_folder, name + '.csv'), sep=',')
             MetadataFrame.to_csv(os.path.join(data_folder, name + '_Metadata' + '.csv'), sep=',')
-            if framelength == test_length:
+            if frame_length == test_length:
                 last_time = time.time()
         converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = last_time
-        converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = framelength
+        converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = frame_length
     print(converted_tests)
-    converted_tests.to_pickle(convert_file)
+    converted_tests.to_pickle(path_converted_test_channels)
     conn.close()
 
     t1 = time.time()
     print("Total run time:", t1 - t0)
     print("Query time:", t2 - t0)
-    time.sleep(1500)
+
+
+def main():
+    while True:
+        parser()
+        time.sleep(1500)
+
+if __name__ == "__main__":
+    main()
