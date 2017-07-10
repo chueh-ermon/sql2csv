@@ -3,14 +3,14 @@
 # April 25th, 2017
 # Modified for use with identical test names being run on different channels
 # Behavior is chosen to export only the most recent version of each test name
-# 
+
 import os
 import pypyodbc
+import pandas as pd
 from time import time, sleep
-import numpy as np
-import pickle
 from sql_func_ch import *
 from frame_func_ch import *
+
 
 data_folder = os.path.normpath('C:/Data/')
 path_converted_test_channels = 'converted_test_channels.pickle'
