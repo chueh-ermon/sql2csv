@@ -14,7 +14,7 @@ import pickle
 from sql_func_ch import *
 from frame_func_ch import *
 
-datafolder = os.path.normpath('C:/Data/')
+data_folder = os.path.normpath('C:/Data/')
 convert_file = 'converted_test_channels.pickle'
 channel_delimiter = '_CH'
 Excluded_tests = ['AB-CC_CV_5V5A_Cap-5V200F', 'AB-CC_CV_5V10A_Cap-5V200F',
@@ -49,33 +49,25 @@ while True:
 
     t0 = time.time()
     c = conn.cursor()
-    ############# Uncomment for Production ###############
-    testnames = Get_test_names(c)
-    testnames = list(set(testnames) - set(Excluded_tests))
-    ############ Comment out for Production #############
-    # testnames = ['2017-05-12_6C-50per_3_6C']
-    ######################################################
 
-    testname_chs = []
-    for test in testnames:
+    test_names = Get_test_names(c)
+    test_names = list(set(test_names) - set(Excluded_tests))
+
+    test_name_chs = []
+    for test in test_names:
         test_ids = Get_Test_IDs(c, test)
-        testid = test_ids[-1]  # just take the most recent test with this name
-        chans = Get_Channel_ID(c, testid)
-        for chan in chans:
-            testname_chs.append([test, testid, chan])
-
-        ############### Comment out for Production ###########
-        # print(testname_chs[0:6])
-        # testname_chs = testname_chs[0:6]
-    ######################################################
+        test_id = test_ids[-1]  # just take the most recent test with this name
+        channels = Get_Channel_ID(c, test_id)
+        for chan in channels:
+            test_name_chs.append([test, test_id, chan])
 
     try:
         converted_tests = pandas.read_pickle(convert_file)
     except:
         converted_tests = pandas.DataFrame(columns=['converted_test_ch', 'lasttime', 'record_length'])
 
-    for testname_ch in testname_chs:
-        name = testname_ch[0] + channel_delimiter + str(testname_ch[2] + 1)  # +1 for liveware indexing
+    for test_name_ch in test_name_chs:
+        name = test_name_ch[0] + channel_delimiter + str(test_name_ch[2] + 1)  # +1 for liveware indexing
         if name in converted_tests.converted_test_ch.unique():
             test_fin_times = converted_tests.lasttime[converted_tests['converted_test_ch'] == name]
             test_lengths = converted_tests.record_length[converted_tests['converted_test_ch'] == name]
@@ -84,30 +76,25 @@ while True:
             print('Updating: ', name)
         else:
             test_fin_time = -1
-            newrow = pandas.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
-            converted_tests = converted_tests.append(newrow, ignore_index=True)
+            new_row = pandas.DataFrame([[name, test_fin_time]], columns=['converted_test_ch', 'lasttime'])
+            converted_tests = converted_tests.append(new_row, ignore_index=True)
             test_length = 0
             print('New test:', name)
 
         # 	Test_ids = Get_Test_IDs(c, testname)
-        MetadataFrame = Get_Metadata(conn, testname_ch[1], testname_ch[2])
-        TestFrame, lasttime, t2 = FullFrame(testname_ch[1], testname_ch[2], test_fin_time, conn, c)
+        MetadataFrame = Get_Metadata(conn, test_name_ch[1], test_name_ch[2])
+        TestFrame, last_time, t2 = FullFrame(test_name_ch[1], test_name_ch[2], test_fin_time, conn, c)
 
         framelength = TestFrame['Cycle_Index'].count()
 
-        if (lasttime <= test_fin_time) & (lasttime > 0):
+        if (last_time <= test_fin_time) & (last_time > 0):
             print('Already converted:', name)
         else:
-            # Test_summary = Frame_summary(TestFrame)
-            # Test_summary.to_csv(os.path.join(datafolder,'CycSum_' + testname + '.csv'), sep=',')
-
-            TestFrame.to_csv(os.path.join(datafolder, name + '.csv'), sep=',')
-            MetadataFrame.to_csv(os.path.join(datafolder, name + '_Metadata' + '.csv'), sep=',')
-
+            TestFrame.to_csv(os.path.join(data_folder, name + '.csv'), sep=',')
+            MetadataFrame.to_csv(os.path.join(data_folder, name + '_Metadata' + '.csv'), sep=',')
             if framelength == test_length:
-                lasttime = time.time()
-
-        converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = lasttime
+                last_time = time.time()
+        converted_tests.loc[converted_tests.converted_test_ch == name, 'lasttime'] = last_time
         converted_tests.loc[converted_tests.converted_test_ch == name, 'record_length'] = framelength
     print(converted_tests)
     converted_tests.to_pickle(convert_file)
