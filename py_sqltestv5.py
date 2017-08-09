@@ -1,5 +1,6 @@
 # Patrick Herring
-# Zee.Aero
+# For more information contact me at
+# pkherring@gmail.com
 # April 25th, 2017
 # Modified for use with identical test names being run on different channels
 # Behavior is chosen to export only the most recent version of each test name
