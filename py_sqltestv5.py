@@ -31,8 +31,7 @@ while 1 == 1:
 	                                  'Arbin_newA_chan8_test_02', 'Arbin_newA_chan8_test_03',
 	                                  '20170509_4_8C-3_6V_test',
 	                                  '20170509_6_0C-3_6V_test','20170509_4C_1C_3_6V',
-	                                  '20170510_testpolicies', '20170411-NP-a123fc-rev2',
-	                                  '20170411-np-6C3C','20170411-np-NP_overpotential','2017-05-18_restingforaesthetics',
+	                                  '20170510_testpolicies','2017-05-18_restingforaesthetics',
 	                                  'GITT_aged_cells', '2017-06-30_CH14']
 
 	conn = pypyodbc.connect('Driver={SQL Server};'
