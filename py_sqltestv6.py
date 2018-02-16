@@ -35,7 +35,9 @@ while True:
 		                                  '20170509_4_8C-3_6V_test',
 		                                  '20170509_6_0C-3_6V_test','20170509_4C_1C_3_6V',
 		                                  '20170510_testpolicies','2017-05-18_restingforaesthetics',
-		                                  'GITT_aged_cells', '2017-06-30_CH14']
+		                                  'GITT_aged_cells', '2017-06-30_CH14', '2017-12-04_4_65C-44per_5C_CH14',
+		                                  '2017-12-04_4_65C-44per_5C_CH24','2017-12-04_4_65C-44per_5C_CH36',
+		                                  '2017-12-04_4_65C-44per_5C_CH42']
 
 		conn = pypyodbc.connect('Driver={SQL Server};'
 								'Server=localhost\SQLEXPRESS;'
