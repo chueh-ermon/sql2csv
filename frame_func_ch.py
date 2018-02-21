@@ -14,7 +14,7 @@ from sql_func_ch import *
 def FullFrame(testid, chan_id, test_fin_time, conn, c):
 	frames = []
 	ivChs, starts, stops, databases = Get_startstop(c, testid, chan_id) #Get the first start time and last stop time
-	if (test_fin_time >= max(stops))&(max(stops)>0): # if there is no newer data, and not running skip
+	if (test_fin_time >= max(stops)) & (max(stops) > 0): # if there is no newer data, and not running skip
 		print(max(stops), test_fin_time)
 		# continue
 	# if max(stops) == max(starts): # if there is no newer data, and not running skip
@@ -38,7 +38,7 @@ def FullFrame(testid, chan_id, test_fin_time, conn, c):
 		# if not chan_id:
 		# 	continue
 
-		for DB in item[3].split(',')[:-1]:
+		for indx, DB in enumerate(item[3].split(',')[:-1]):
 			connection, cur = Results_connect(DB)
 			print('Get channel query time', time.time() - ti1)
 			steps = Get_Steps(connection, chan_id, start*10000000, stop*10000000)
@@ -52,24 +52,26 @@ def FullFrame(testid, chan_id, test_fin_time, conn, c):
 			dataframe = pandas.concat([dataraw, dataaux], axis=1, join='outer') #left join the 
 			fullframe = pandas.concat([steps, dataframe], axis=1, join='outer')
 			fullframe = fullframe.reset_index() #Creates index column (data point)
-			fullframe['Test_Time'] = fullframe.date_time - fullframe.date_time[0]
+			if indx == 0: # for multiple databases, use only the first starting time
+				start_time = fullframe.date_time[0]
+			fullframe['Test_Time'] = fullframe.date_time - start_time
 			fullframe['Step_Time'] = fullframe['date_time']
 			fullframe.ix[fullframe.Step_Index.isnull(), 'Step_Time'] = np.NaN
 			fullframe.fillna(method='ffill', inplace=True)
 			fullframe.fillna(method='bfill', inplace=True)
 			fullframe.Step_Time = fullframe.apply(Fill_times, axis=1)
-			fullframe.date_time = fullframe.date_time/10000000
-			fullframe.Step_Time = fullframe.Step_Time/10000000
-			fullframe.Test_Time = fullframe.Test_Time/10000000
+			fullframe.date_time = fullframe.date_time / 10000000
+			fullframe.Step_Time = fullframe.Step_Time / 10000000
+			fullframe.Test_Time = fullframe.Test_Time / 10000000
 			fullframe['AC_Impedance'] = 0
 			fullframe['Is_FC_Data'] = 0
 			fullframe['ACI_Phase_Angle'] = 0
-			fullframe = fullframe[fullframe.Step_Time != 0] # delete the rows that were inserted by steps frame
+			fullframe = fullframe[fullframe.Step_Time != 0]  # delete the rows that were inserted by steps frame
 			fullframe.index.name = 'Data_Point'
 			fullframe = fullframe.rename(columns={'date_time': 'DateTime'})
 			cols = ['Test_Time', 'DateTime', 'Step_Time', 'Step_Index', 'Cycle_Index',
 					'Current', 'Voltage', 'Charge_Capacity', 'Discharge_Capacity', 'Charge_Energy',
-					'Discharge_Energy', 'dV/dt','Internal_Resistance','Temperature']#,'Shelf_Temp', 'Shelf_Temp2']
+					'Discharge_Energy', 'dV/dt', 'Internal_Resistance', 'Temperature']#,'Shelf_Temp', 'Shelf_Temp2']
 					#cols = ['Test_Time', 'DateTime', 'Step_Time', 'Step_Index', 'Cycle_Index',
 					#'Current', 'Voltage', 'Charge_Capacity', 'Discharge_Capacity', 'Charge_Energy',
 					#'Discharge_Energy', 'dV/dt', 'Internal_Resistance', 'Is_FC_Data', 'AC_Impedance',
